@@ -22,12 +22,12 @@ public:
     int addNewDevice(Device device);
 
     User getUserByLogin(string login);
-    Device getDeviceById(int id);
-    Notification getNotificationById(int id);
+    Device getDeviceById(string id);
+    Notification getNotificationById(string id);
     void setNotificationRead(Notification notification);
 
     void updateDevice(Device device);
-    void updateDeviceLoginDate(int deviceid);
+    void updateDeviceLoginDate(string deviceid);
     bool addNewNotification(Notification notification);
     vector<Notification> getNewDeviceNotifications(Device device);
     vector<Notification> getFreshlyReadDeviceNotifications(Device device);

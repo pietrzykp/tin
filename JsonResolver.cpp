@@ -44,7 +44,7 @@ void JsonResolver::resolveLoginRequest() {
     Json::Value cipheredData = parsedJson["cipheredData"];
     string login = cipheredData.get("user", "").asString();
     string hashpassword = cipheredData.get("password", "").asString();
-    int deviceid = cipheredData.get("deviceId", 0).asInt();
+    string deviceid = cipheredData.get("deviceId","").asString();
     if(login == "" || hashpassword == "") {
         returnedJson = JsonBuilder::failureResponse("invalidQuery");
         return;
@@ -59,7 +59,7 @@ void JsonResolver::resolveLoginRequest() {
         return;
     }
     int did;
-    if(deviceid == 0) {
+    if(deviceid == "") {
         Device device(0, "", user.id, 0, 0, 0, 0);
         did = service->addNewDevice(device);
     } else {
@@ -73,14 +73,14 @@ void JsonResolver::resolveLoginRequest() {
             return;
         }
         did = device.id;
-        service->updateDeviceLoginDate(device.id);
+        service->updateDeviceLoginDate(deviceid);
     }
     returnedJson = JsonBuilder::loginOrRegisterSuccess(did);
     return;
 }
 
 void JsonResolver::resolveNewMessagesRequest() {
-    int deviceId = parsedJson.get("deviceID", 0).asInt();
+    string deviceId = parsedJson.get("deviceID", "").asString();
     Device device = service->getDeviceById(deviceId);
     if(device.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");
@@ -93,8 +93,8 @@ void JsonResolver::resolveNewMessagesRequest() {
 }
 
 void JsonResolver::resolveMessageRead() {
-    int deviceId = parsedJson.get("deviceID", 0).asInt();
-    if(deviceId == 0) {
+    string deviceId = parsedJson.get("deviceID", "").asString();
+    if(deviceId == "") {
         returnedJson = JsonBuilder::failureResponse("invalidQuery");
         return;
     }
@@ -105,7 +105,7 @@ void JsonResolver::resolveMessageRead() {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");
         return;
     }
-    Notification notification = service->getNotificationById(atoi(messageId.c_str()));
+    Notification notification = service->getNotificationById(messageId);
     if(notification.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchMessage");
         return;
@@ -145,7 +145,7 @@ void JsonResolver::resolveRegisterRequest() {
 }
 
 void JsonResolver::resolveMessageReceived() {
-    int deviceId = parsedJson.get("deviceID", 0).asInt();
+    string deviceId = parsedJson.get("deviceID", 0).asString();
     Device device = service->getDeviceById(deviceId);
     if(device.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");

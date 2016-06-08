@@ -6,7 +6,8 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
-string DROP_TABLES = "drop table notifications; drop table devices; drop table users; ";
+string DROP_TABLES = "drop table if exists tokens; drop table if exists notifications; "
+        "drop table if exists devices; drop table if exists users; ";
 string INIT_DATABASE_QUERY = "create table users (id serial primary key not null,login character varying(128), "
         "hashpassword character varying(128) ); create table notifications (id serial not null primary key, "
         "text character varying(1024), created date, userid integer references users, readid integer ); "
@@ -84,7 +85,7 @@ User DatabaseService::getUserByLogin(string login) {
     return User(0, "", "");
 }
 
-Device DatabaseService::getDeviceById(int id) {
+Device DatabaseService::getDeviceById(string id) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << id;
@@ -96,7 +97,7 @@ Device DatabaseService::getDeviceById(int id) {
     return Device(0, "", 0, 0, 0, 0, 0);
 }
 
-Notification DatabaseService::getNotificationById(int id) {
+Notification DatabaseService::getNotificationById(string id) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << id;
@@ -108,7 +109,7 @@ Notification DatabaseService::getNotificationById(int id) {
     return Notification(0, "", "", 0, 0);
 }
 
-void DatabaseService::updateDeviceLoginDate(int deviceid) {
+void DatabaseService::updateDeviceLoginDate(string deviceid) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << deviceid;
