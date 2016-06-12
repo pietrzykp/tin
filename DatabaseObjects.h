@@ -9,19 +9,17 @@
 #include <pqxx/pqxx>
 #include <iostream>
 
-using std::string;
-
 struct User {
     int id;
-    string login;
-    string hashpassword;
+    std::string login;
+    std::string hashpassword;
     User() {};
-    User(int i, string l, string h) : id(i), login(l), hashpassword(h) {};
+    User(int i, std::string l, std::string h) : id(i), login(l), hashpassword(h) {};
     User(pqxx::result::const_iterator row) {
         try {
             id = row[0].as<int>();
-            login = row[1].as<string>();
-            hashpassword = row[2].as<string>();
+            login = row[1].as<std::string>();
+            hashpassword = row[2].as<std::string>();
         } catch(...) {
             std::cout<<"error user";
         }
@@ -30,16 +28,16 @@ struct User {
 
 struct Notification {
     int id;
-    string text;
-    string created;
+    std::string text;
+    std::string created;
     int userid;
     int readid;
-    Notification (int i, string t, string c, int uid, int rid) : id(i), text(t), created(c), userid(uid), readid(rid) {};
+    Notification (int i, std::string t, std::string c, int uid, int rid) : id(i), text(t), created(c), userid(uid), readid(rid) {};
     Notification (pqxx::result::const_iterator row) {
         try {
             id = row[0].as<int>();
-            text = row[1].as<string>();
-            created = row[2].as<string>();
+            text = row[1].as<std::string>();
+            created = row[2].as<std::string>();
             userid = row[3].as<int>();
             readid = row[4].as<int>();
         } catch(...) {
@@ -50,18 +48,18 @@ struct Notification {
 
 struct Device {
     int id;
-    string lastlogindate;
+    std::string lastlogindate;
     int userid;
     int lastqueryid;
     int lastreadid;
     int lastquerytmp;
     int lastreadtmp;
-    Device (int i, string lld, int uid, int lqi, int lri, int lqt, int lrt) :
+    Device (int i, std::string lld, int uid, int lqi, int lri, int lqt, int lrt) :
             id(i), lastlogindate(lld), userid(uid), lastqueryid(lqi), lastreadid(lri), lastquerytmp(lqt), lastreadtmp(lrt) {};
     Device (pqxx::result::const_iterator row) {
         try {
             id = row[0].as<int>();
-            lastlogindate = row[1].as<string>();
+            lastlogindate = row[1].as<std::string>();
             userid = row[2].as<int>();
             lastqueryid = row[3].as<int>();
             lastreadid = row[4].as<int>();

@@ -6,16 +6,11 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
-string DROP_TABLES = "drop table if exists tokens; drop table if exists notifications; "
-        "drop table if exists devices; drop table if exists users; ";
-string INIT_DATABASE_QUERY = "create table users (id serial primary key not null,login character varying(128), "
-        "hashpassword character varying(128) ); create table notifications (id serial not null primary key, "
-        "text character varying(1024), created date, userid integer references users, readid integer ); "
-        "create table devices ( id serial not null primary key, lastlogindate date, userid integer references users,"
-        "lastqueryid integer, lastreadid integer, lastquerytmp integer, lastreadtmp integer);";
+#include "TableSQLs.h"
 
-bool DatabaseService::initConnection(string dbname, string user, string password, string hostaddr, string port) {
-    string connecttionString = "dbname=" + dbname + " user=" + user + " password=" + password +
+
+bool DatabaseService::initConnection(std::string  dbname, std::string  user, std::string password, std::string hostaddr, std::string port) {
+    std::string connecttionString = "dbname=" + dbname + " user=" + user + " password=" + password +
         " hostaddr=" + hostaddr + " port=" + port;
     conn = new connection(connecttionString);
     if(!conn->is_open())
@@ -75,7 +70,7 @@ bool DatabaseService::addNewNotification(Notification notification) {
 
 }
 
-User DatabaseService::getUserByLogin(string login) {
+User DatabaseService::getUserByLogin(std::string login) {
     pqxx::work txn(*conn);
     pqxx::result result = txn.exec("select id, login, hashpassword from users where users.login = " + txn.quote(login));
     txn.commit();
@@ -85,7 +80,7 @@ User DatabaseService::getUserByLogin(string login) {
     return User(0, "", "");
 }
 
-Device DatabaseService::getDeviceById(string id) {
+Device DatabaseService::getDeviceById(std::string id) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << id;
@@ -97,7 +92,7 @@ Device DatabaseService::getDeviceById(string id) {
     return Device(0, "", 0, 0, 0, 0, 0);
 }
 
-Notification DatabaseService::getNotificationById(string id) {
+Notification DatabaseService::getNotificationById(std::string id) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << id;
@@ -109,7 +104,7 @@ Notification DatabaseService::getNotificationById(string id) {
     return Notification(0, "", "", 0, 0);
 }
 
-void DatabaseService::updateDeviceLoginDate(string deviceid) {
+void DatabaseService::updateDeviceLoginDate(std::string deviceid) {
     pqxx::work txn(*conn);
     std::ostringstream srid;
     srid << deviceid;
@@ -125,7 +120,7 @@ void DatabaseService::setNotificationRead(Notification notification) {
     txn.commit();
 }
 
-vector<Notification> DatabaseService::getFreshlyReadDeviceNotifications(Device device) {
+std::vector<Notification> DatabaseService::getFreshlyReadDeviceNotifications(Device device) {
     pqxx::work txn(*conn);
     std::ostringstream did, lastreadid, id2;
     did << device.userid;
@@ -135,14 +130,14 @@ vector<Notification> DatabaseService::getFreshlyReadDeviceNotifications(Device d
                                    + did.str() + ") where id = " + id2.str() + ";");
     pqxx::result result = txn.exec("select * from notifications where userid = " + did.str() + " and readid > " + lastreadid.str() + ";");
     txn.commit();
-    vector<Notification> end;
+    std::vector<Notification> end;
     for (pqxx::result::const_iterator row = result.begin(); row != result.end(); ++row) {
         end.push_back(Notification(row));
     }
     return end;
 }
 
-vector<Notification> DatabaseService::getNewDeviceNotifications(Device device) {
+std::vector<Notification> DatabaseService::getNewDeviceNotifications(Device device) {
     pqxx::work txn(*conn);
     std::ostringstream uid, last, did;
     uid << device.userid;
@@ -152,7 +147,7 @@ vector<Notification> DatabaseService::getNewDeviceNotifications(Device device) {
              + uid.str() + ") where id = " + did.str() + ";");
     pqxx::result result = txn.exec("select * from notifications where userid = " + uid.str() + " and id > " + last.str());
     txn.commit();
-    vector<Notification> end;
+    std::vector<Notification> end;
     for (pqxx::result::const_iterator row = result.begin(); row != result.end(); ++row) {
         end.push_back(Notification(row));
     }

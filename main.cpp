@@ -12,17 +12,25 @@ using namespace std;
 
 int main() {
 
-    string json;
+    string json, deviceId, action;
     DatabaseService s;
     s.initConnection("tin", "postgres", "tin", "127.0.0.1", "5432");
-    /*s.initOrClearTables();
     while(getline(cin, json)){
-        JsonResolver res(json);
+        getline(cin, deviceId);
+        getline(cin, action);
+        if(json == "newNotif") {
+            string i;
+            string str;
+            getline(cin, i);
+            getline(cin, str);
+            Notification n(0, str, "", atoi(i.c_str()), 0);
+            s.addNewNotification(n);
+            continue;
+        }
+        JsonResolver res(atoi(action.c_str()), atoi(deviceId.c_str()), json);
         res.execute(&s);
         res.print();
-    }*/
-    Notification n(0, "cipa na bahamach", "", 1, 0);
-    s.addNewNotification(n);
+    }
 
 
 

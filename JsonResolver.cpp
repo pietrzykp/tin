@@ -6,7 +6,7 @@
 #include "json/json.h"
 #include "JsonBuilder.h"
 
-JsonResolver::JsonResolver(string jsonString) {
+JsonResolver::JsonResolver(int action_, int deviceId_, std::string jsonString) : action(action_), deviceId(deviceId_) {
     Json::Reader reader;
     bool parsingSuccessful = reader.parse(jsonString.c_str(), parsedJson);
     if (!parsingSuccessful) {
@@ -20,31 +20,34 @@ void JsonResolver::execute(DatabaseService * service) {
     if(!parsed)
         return;
     this->service = service;
-    string action = parsedJson.get("action", "invalid").asString();
-    if (action == "invalid") {
-        returnedJson = JsonBuilder::failureResponse("invalidQuery");
-        return;
+    switch(action) {
+        case 0:
+            resolveRegisterRequest();
+            break;
+        case 1:
+            resolveLoginRequest();
+            break;
+        case 2:
+            resolveNewMessagesRequest();
+            break;
+        case 3:
+            resolveMessageReceived();
+            break;
+        case 4:
+            resolveMessageRead();
+            break;
+        default:
+            returnedJson = JsonBuilder::failureResponse("invalidQuery");
+            break;
     }
-    if (action == "registerRequest")
-        resolveRegisterRequest();
-    else if (action == "loginRequest")
-        resolveLoginRequest();
-    else if (action == "newMessagesRequest")
-        resolveNewMessagesRequest();
-    else if (action == "messageRead")
-        resolveMessageRead();
-    else if (action == "messageReceived")
-        resolveMessageReceived();
-    else
-        returnedJson = JsonBuilder::failureResponse("invalidQuery");
     return;
 }
 
 void JsonResolver::resolveLoginRequest() {
     Json::Value cipheredData = parsedJson["cipheredData"];
-    string login = cipheredData.get("user", "").asString();
-    string hashpassword = cipheredData.get("password", "").asString();
-    string deviceid = cipheredData.get("deviceId","").asString();
+    std::string login = cipheredData.get("user", "").asString();
+    std::string hashpassword = cipheredData.get("password", "").asString();
+    std::string deviceid = cipheredData.get("deviceId","").asString();
     if(login == "" || hashpassword == "") {
         returnedJson = JsonBuilder::failureResponse("invalidQuery");
         return;
@@ -80,27 +83,25 @@ void JsonResolver::resolveLoginRequest() {
 }
 
 void JsonResolver::resolveNewMessagesRequest() {
-    string deviceId = parsedJson.get("deviceID", "").asString();
-    Device device = service->getDeviceById(deviceId);
+    Device device = service->getDeviceById(std::to_string(deviceId));
     if(device.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");
         return;
     }
-    vector<Notification> read = service->getFreshlyReadDeviceNotifications(device);
-    vector<Notification> newNotifications = service->getNewDeviceNotifications(device);
+    std::vector<Notification> read = service->getFreshlyReadDeviceNotifications(device);
+    std::vector<Notification> newNotifications = service->getNewDeviceNotifications(device);
     returnedJson = JsonBuilder::messagesResponse(newNotifications, read);
     return;
 }
 
 void JsonResolver::resolveMessageRead() {
-    string deviceId = parsedJson.get("deviceID", "").asString();
-    if(deviceId == "") {
+    if(deviceId < 1) {
         returnedJson = JsonBuilder::failureResponse("invalidQuery");
         return;
     }
     Json::Value cipheredData = parsedJson["cipheredData"];
-    string messageId = cipheredData.get("messageId", "").asString();
-    Device device = service->getDeviceById(deviceId);
+    std::string messageId = cipheredData.get("messageId", "").asString();
+    Device device = service->getDeviceById(std::to_string(deviceId));
     if(device.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");
         return;
@@ -125,8 +126,8 @@ void JsonResolver::resolveMessageRead() {
 
 void JsonResolver::resolveRegisterRequest() {
     Json::Value cipheredData = parsedJson["cipheredData"];
-    string login = cipheredData.get("user", "").asString();
-    string hashpassword = cipheredData.get("password", "").asString();
+    std::string login = cipheredData.get("user", "").asString();
+    std::string hashpassword = cipheredData.get("password", "").asString();
     if(login == "" || hashpassword == ""){
         returnedJson = JsonBuilder::failureResponse("invalidQuery");
         return;
@@ -145,8 +146,7 @@ void JsonResolver::resolveRegisterRequest() {
 }
 
 void JsonResolver::resolveMessageReceived() {
-    string deviceId = parsedJson.get("deviceID", 0).asString();
-    Device device = service->getDeviceById(deviceId);
+    Device device = service->getDeviceById(std::to_string(deviceId));
     if(device.id == 0) {
         returnedJson = JsonBuilder::failureResponse("noSuchDevice");
         return;
@@ -156,18 +156,18 @@ void JsonResolver::resolveMessageReceived() {
     return;
 }
 
-void JsonResolver::addToReturnedCiphered(string label, string value) {
+void JsonResolver::addToReturnedCiphered(std::string label, std::string value) {
     JsonBuilder::addToJson(label, value, returnedJson["cipheredData"]);
 }
 
-void JsonResolver::addToReturnedRoot(string label, string value) {
+void JsonResolver::addToReturnedRoot(std::string label, std::string value) {
     JsonBuilder::addToJson(label, value, returnedJson);
 }
 
-string JsonResolver::getFromParsedCiphered(string label) {
+std::string JsonResolver::getFromParsedCiphered(std::string label) {
     return parsedJson["cipheredData"].get(label, "").asString();
 }
 
-string JsonResolver::getFromParsedRoot(string label) {
+std::string JsonResolver::getFromParsedRoot(std::string label) {
     return parsedJson.get(label, "").asString();
 }

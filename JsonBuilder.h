@@ -8,17 +8,15 @@
 #include "DatabaseObjects.h"
 #include "json/json.h"
 #include <vector>
-using std::vector;
-using std::string;
 
 class JsonBuilder {
 
 public:
     static Json::Value loginOrRegisterSuccess(int deviceid);
-    static Json::Value messagesResponse(vector<Notification>& newMessages, vector<Notification> &read);
-    static Json::Value failureResponse(string msg);
+    static Json::Value messagesResponse(std::vector<Notification>& newMessages, std::vector<Notification> &read);
+    static Json::Value failureResponse(std::string msg);
     static Json::Value successResponse();
-    static void addToJson(string label, string value, Json::Value & root);
+    static void addToJson(std::string label, std::string value, Json::Value & root);
 };
 
 

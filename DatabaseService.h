@@ -7,30 +7,29 @@
 
 #include <string>
 #include "DatabaseObjects.h"
-using std::string;
-using std::vector;
 using namespace pqxx;
+
 class DatabaseService {
 
     connection* conn;
 
 public:
     DatabaseService() {};
-    bool initConnection(string dbname, string user, string password, string hostaddr, string port);
+    bool initConnection(std::string dbname, std::string user, std::string password, std::string hostaddr, std::string port);
     bool initOrClearTables();
     int addNewUser(User user);
     int addNewDevice(Device device);
 
-    User getUserByLogin(string login);
-    Device getDeviceById(string id);
-    Notification getNotificationById(string id);
+    User getUserByLogin(std::string login);
+    Device getDeviceById(std::string id);
+    Notification getNotificationById(std::string id);
     void setNotificationRead(Notification notification);
 
     void updateDevice(Device device);
-    void updateDeviceLoginDate(string deviceid);
+    void updateDeviceLoginDate(std::string deviceid);
     bool addNewNotification(Notification notification);
-    vector<Notification> getNewDeviceNotifications(Device device);
-    vector<Notification> getFreshlyReadDeviceNotifications(Device device);
+    std::vector<Notification> getNewDeviceNotifications(Device device);
+    std::vector<Notification> getFreshlyReadDeviceNotifications(Device device);
 
 
     ~DatabaseService();

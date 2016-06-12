@@ -5,23 +5,19 @@
 #include "JsonBuilder.h"
 #include "json/json.h"
 
-Json::Value JsonBuilder::failureResponse(string msg) {
+Json::Value JsonBuilder::failureResponse(std::string msg) {
     Json::Value root;
-    Json::Value cipheredData;
-    cipheredData["success"] = false;
-    cipheredData["value"] = msg;
-    root["cipheredData"] = cipheredData;
+    root["success"] = false;
+    root["value"] = msg;
     return root;
 }
 
 Json::Value JsonBuilder::loginOrRegisterSuccess(int id) {
     Json::Value root;
-    Json::Value cipheredData;
     Json::Value value;
-    cipheredData["success"] = true;
-    value["deviceId"] = id;
-    cipheredData["value"] = value;
-    root["cipheredData"] = cipheredData;
+    root["success"] = true;
+    value["deviceId"] = std::to_string(id);
+    root["value"] = value;
     return root;
 }
 
@@ -33,7 +29,7 @@ Json::Value JsonBuilder::successResponse() {
     return root;
 }
 
-Json::Value JsonBuilder::messagesResponse(vector<Notification> &newMessages, vector<Notification> &read) {
+Json::Value JsonBuilder::messagesResponse(std::vector<Notification> &newMessages, std::vector<Notification> &read) {
     Json::Value root;
     Json::Value cipheredData;
     cipheredData["success"] = true;
@@ -45,13 +41,13 @@ Json::Value JsonBuilder::messagesResponse(vector<Notification> &newMessages, vec
     cipheredData["messages"] = messages;
     Json::Value readMessages;
     for(int i = 0; i < read.size(); ++i) {
-        readMessages[i]["id"] = read[i].id;
+        readMessages[i] = read[i].id;
     }
     cipheredData["readMessages"] = readMessages;
     root["cipheredData"] = cipheredData;
     return root;
 }
 
-void JsonBuilder::addToJson(string label, string value, Json::Value &root) {
+void JsonBuilder::addToJson(std::string label, std::string value, Json::Value &root) {
     root[label] = value;
 }

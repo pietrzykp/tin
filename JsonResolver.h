@@ -9,12 +9,12 @@
 #include "json/json.h"
 #include "DatabaseService.h"
 
-using std::string;
-using std::cout;
-
 class JsonResolver {
 
     DatabaseService * service;
+    int action;
+    int deviceId;
+
     Json::Value parsedJson;
     Json::Value returnedJson;
 
@@ -25,17 +25,18 @@ class JsonResolver {
     void resolveMessageReceived();
     bool parsed;
 public:
-    JsonResolver(string jsonString);
+    JsonResolver(int action_, int deviceId_, std::string jsonString);
     void execute( DatabaseService * service);
     void print() { std::cout<<returnedJson.toStyledString() ;};
-    string getReturnedJsonString() { return returnedJson.asString(); };
+    Json::Value getReturnedJson() { return returnedJson;};
+    std::string getReturnedJsonString() { return returnedJson.asString(); };
     bool isParsed() { return parsed; }
 
-    string getFromParsedRoot(string label);
-    string getFromParsedCiphered(string label);
+    std::string getFromParsedRoot(std::string label);
+    std::string getFromParsedCiphered(std::string label);
 
-    void addToReturnedRoot(string label, string value);
-    void addToReturnedCiphered(string label, string value);
+    void addToReturnedRoot(std::string label, std::string value);
+    void addToReturnedCiphered(std::string label, std::string value);
 };
 
 

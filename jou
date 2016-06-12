@@ -1,16 +1,14 @@
-//register request	
-{ "action": "registerRequest", "size": "X", "devieceID":"_" , "cipheredData": { "user": "login", "password": "aaa", "publicKey": "key" } }
+//register
+{"cipheredData": {"user": "bbb","password": "aaa","publicKey": "aaa", "modulus": "aaa"}}
 
-//login request
-{ "action": "loginRequest", "size": "X", "deviceID":"_" , "cipheredData": { "user": "login", "password": "aaa", "publicKey": "key", "deviceId": "1" } }
+//login - device istnieje
+{"cipheredData": {"user": "aaa","password": "aaa","publicKey": "key","modulus": "mod","deviceId": "1"}}
 
-{ "action": "loginRequest", "size": "X", "devieceID":"_" , "cipheredData": { "user": "login", "password": "aaa", "publicKey": "key", "deviceId": "" } }
+//messagesrequest
+{"cipheredData":{"hashDevieceID":"xxxxxxx", "hashAction": "xxxxxx"}}
 
-//new messages
-{ "action": "newMessagesRequest", "size": "X", "deviceID":"1" , "cipheredData": { "notimportant" : "notimportant" } }
+//messageReceived
+{"cipheredData": { "hashDevieceID":"xxxxxx", "hashAction":"xxxxxx","hashMessage":"xxxxxx"}}
 
-//messageRead
-{ "action" : "messageRead", "size" : "X", "deviceID":"1" , "cipheredData": { "messageId" : "1" } }
-
-{"action" : "messageReceived", "deviceID" : "1"}
-
+//messageread
+{"cipheredData":{"hashDevieceID":"xxxxx", "hashAction":"xxxxx", "messageId": 1}}
